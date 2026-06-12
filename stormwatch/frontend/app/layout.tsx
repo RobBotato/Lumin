@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" style={{ scrollBehavior: "smooth" }}>
+    <html lang="en" style={{ scrollBehavior: "smooth" }} data-scroll-behavior="smooth">
       <body className={`${bricolage.variable} ${instrument.variable} ${plexMono.variable} antialiased`}>
         <div className="atmosphere" aria-hidden />
         <div className="grid-overlay" aria-hidden />

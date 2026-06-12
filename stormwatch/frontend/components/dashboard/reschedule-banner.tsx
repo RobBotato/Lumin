@@ -3,6 +3,8 @@
 import { CalendarCheck, CalendarPlus, Clock, MoveRight } from "lucide-react";
 import type { RescheduleInfo, ShipmentInput } from "@/lib/types";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+
 interface Props {
   reschedule: RescheduleInfo;
   shipment: ShipmentInput;
@@ -11,7 +13,7 @@ interface Props {
 export function RescheduleBanner({ reschedule, shipment }: Props) {
   if (!reschedule) return null;
 
-  const calUrl = new URL("http://localhost:8080/api/calendar-event");
+  const calUrl = new URL(`${API_BASE}/api/calendar-event`);
   calUrl.searchParams.set("title", shipment.productType);
   calUrl.searchParams.set("date", reschedule.newDate);
   calUrl.searchParams.set("origin", shipment.origin);

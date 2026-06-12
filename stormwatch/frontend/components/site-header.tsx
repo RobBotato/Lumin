@@ -6,11 +6,13 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+
 export function SiteHeader() {
   const [calConnected, setCalConnected] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/auth/google/status")
+    fetch(`${API_BASE}/api/auth/google/status`)
       .then((r) => r.json())
       .then((d) => setCalConnected(d.connected))
       .catch(() => {});
@@ -28,14 +30,6 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
-          {["Platform", "Intelligence", "Network", "Docs"].map((item) => (
-            <span key={item} className="cursor-default rounded-lg px-3 py-1.5 text-sm text-muted transition-colors hover:text-foreground">
-              {item}
-            </span>
-          ))}
-        </nav>
-
         <div className="flex items-center gap-3">
           {calConnected ? (
             <span className="hidden sm:inline-flex items-center gap-2 rounded-full border border-green/30 bg-green/[0.08] px-3 py-1 font-mono text-[11px] text-green">
@@ -47,7 +41,7 @@ export function SiteHeader() {
             </span>
           ) : (
             <a
-              href="http://localhost:8080/api/auth/google"
+              href={`${API_BASE}/api/auth/google`}
               className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-card-border bg-white/[0.03] px-3 py-1 font-mono text-[10px] text-muted hover:border-accent/30 hover:text-accent transition-colors"
             >
               Connect Calendar

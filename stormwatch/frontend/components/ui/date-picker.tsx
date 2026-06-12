@@ -7,12 +7,17 @@ interface DatePickerProps { value: string; onChange: (value: string) => void; id
 const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
+function todayDate(): Date { const d = new Date(); d.setHours(0,0,0,0); return d; }
+
 export function DatePicker({ value, onChange, id }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
-  const selected = value ? new Date(value + "T12:00:00") : new Date();
-  const [viewYear, setViewYear] = React.useState(selected.getFullYear());
-  const [viewMonth, setViewMonth] = React.useState(selected.getMonth());
+  const selected = value ? new Date(value + "T12:00:00") : (mounted ? new Date() : new Date(0));
+  const [viewYear, setViewYear] = React.useState(() => selected.getFullYear() || new Date().getFullYear());
+  const [viewMonth, setViewMonth] = React.useState(() => selected.getMonth() || new Date().getMonth());
+
+  React.useEffect(() => { setMounted(true); }, []);
 
   React.useEffect(() => {
     function handleClick(e: MouseEvent) { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); }
@@ -20,7 +25,7 @@ export function DatePicker({ value, onChange, id }: DatePickerProps) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [open]);
 
-  const today = new Date(); today.setHours(0,0,0,0);
+  const today = mounted ? todayDate() : new Date(0);
   const daysInMonth = (y:number,m:number) => new Date(y,m+1,0).getDate();
   const firstDay = (y:number,m:number) => new Date(y,m,1).getDay();
   const selectDate = (day:number) => { const d = new Date(viewYear,viewMonth,day); onChange(d.toISOString().slice(0,10)); setOpen(false); };
@@ -33,7 +38,9 @@ export function DatePicker({ value, onChange, id }: DatePickerProps) {
   for(let i=0;i<start;i++) cells.push(null);
   for(let d=1;d<=total;d++) cells.push(d);
 
-  const formatted = selected.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+  const formatted = mounted
+    ? selected.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"})
+    : value ? new Date(value + "T12:00:00").toISOString().slice(0,10) : "Select date";
 
   return (
     <div ref={ref} className="relative">
@@ -53,9 +60,9 @@ export function DatePicker({ value, onChange, id }: DatePickerProps) {
               {cells.map((day,i)=>{
                 if(day===null) return <div key={`e${i}`} className="aspect-square" />;
                 const date=new Date(viewYear,viewMonth,day);date.setHours(0,0,0,0);
-                const isToday=date.getTime()===today.getTime();
+                const isToday=mounted && date.getTime()===today.getTime();
                 const isSel=day===selected.getDate()&&viewMonth===selected.getMonth()&&viewYear===selected.getFullYear();
-                const isPast=date.getTime()<today.getTime();
+                const isPast=mounted && date.getTime()<today.getTime();
                 return <button key={day} type="button" disabled={isPast} onClick={()=>selectDate(day)} className={cn("aspect-square flex items-center justify-center rounded-lg font-mono text-xs transition-all",isSel&&"bg-accent text-black font-semibold shadow-[0_0_12px_-2px_var(--accent)]",!isSel&&!isPast&&"text-foreground hover:bg-white/[0.08]",isPast&&"text-faint/30 cursor-default",isToday&&!isSel&&"border border-accent/40 text-accent")}>{day}</button>;
               })}
             </div>

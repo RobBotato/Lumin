@@ -29,9 +29,13 @@ export function ShipmentForm() {
   const [submitting, setSubmitting] = React.useState(false);
   const [showSuggestions, setShowSuggestions] = React.useState(false);
   const [form, setForm] = React.useState<ShipmentInput>({
-    productType: "Electronics", origin: "Seattle, WA", destination: "Chicago, IL", shippingDate: defaultShippingDate(),
-    quantity: 500, estimatedWeight: 1200, weightUnit: "kg", shipmentValue: 1800000, packagingType: "Waterproof", transportMethod: "Rail", deliveryPriority: "Expedited", riskTolerance: "Balanced",     clientPhone: "", clientName: "", clientEmail: "",
+    productType: "Electronics", origin: "Seattle, WA", destination: "Chicago, IL", shippingDate: "",
+    quantity: 500, estimatedWeight: 1200, weightUnit: "kg", shipmentValue: 1800000, packagingType: "Waterproof", transportMethod: "Rail", deliveryPriority: "Expedited", riskTolerance: "Balanced", clientPhone: "", clientName: "", clientEmail: "",
   });
+
+  React.useEffect(() => {
+    setForm((prev) => ({ ...prev, shippingDate: defaultShippingDate() }));
+  }, []);
 
   const filteredSuggestions = SUGGESTIONS.filter((s) => s.toLowerCase().includes(form.productType.toLowerCase())).filter((s) => s.toLowerCase() !== form.productType.toLowerCase());
   const isValid = form.productType.trim().length > 0 && form.origin.trim().length > 0 && form.destination.trim().length > 0 && form.shippingDate.length > 0;

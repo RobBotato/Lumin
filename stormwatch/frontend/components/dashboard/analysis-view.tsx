@@ -30,7 +30,7 @@ function parseShipment(params: URLSearchParams): ShipmentInput {
     productType: params.get("product") || "Consumer Goods",
     origin: params.get("origin") || "Phoenix, AZ",
     destination: params.get("destination") || "Dallas, TX",
-    shippingDate: params.get("date") || new Date().toISOString().slice(0, 10),
+    shippingDate: params.get("date") || "",
     quantity: params.get("quantity") ? parseInt(params.get("quantity")!) : undefined,
     estimatedWeight: params.get("weight") ? parseFloat(params.get("weight")!) : undefined,
     weightUnit: (params.get("weightUnit") as "kg" | "lbs") || undefined,
@@ -144,10 +144,12 @@ export function AnalysisView() {
           </div>
         </div>
 
-        {/* Row 2: Threats */}
-        <div className="animate-fade-up" style={{ animationDelay: "0.2s" }}>
-          <ThreatsCard threats={analysis.threats} />
-        </div>
+        {/* Row 2: Threats (only when businessImpact is present, otherwise already shown above) */}
+        {analysis.businessImpact && (
+          <div className="animate-fade-up" style={{ animationDelay: "0.2s" }}>
+            <ThreatsCard threats={analysis.threats} />
+          </div>
+        )}
 
         {analysis.safeShippingWindows?.length ? (
           <div className="animate-fade-up" style={{ animationDelay: "0.3s" }}><SafeShippingCard windows={analysis.safeShippingWindows} /></div>
@@ -164,15 +166,21 @@ export function AnalysisView() {
 
         <div className="grid gap-5 lg:grid-cols-12">
           <div className="animate-fade-up lg:col-span-6" style={{ animationDelay: "0.6s" }}>
-            {analysis.portWeather ? <PortWeatherCard portWeather={analysis.portWeather} /> : <RecommendationsCard recommendations={analysis.recommendations} />}
+            {analysis.portWeather ? (
+              <PortWeatherCard portWeather={analysis.portWeather} />
+            ) : analysis.alternativeRoutes?.length ? (
+              <RecommendationsCard recommendations={analysis.recommendations} />
+            ) : null}
           </div>
-          <div className="animate-fade-up lg:col-span-6" style={{ animationDelay: "0.7s" }}><AgentTimeline events={analysis.agentEvents} /></div>
+          <div className="animate-fade-up lg:col-span-6" style={{ animationDelay: "0.7s" }}>
+            {analysis.financialBreakdown ? <AgentTimeline events={analysis.agentEvents} /> : <RecommendationsCard recommendations={analysis.recommendations} />}
+          </div>
         </div>
       </div>
 
       {/* Footer */}
       <div className="animate-fade-up mt-10 flex flex-col items-center justify-between gap-4 rounded-2xl border border-card-border bg-white/[0.02] px-6 py-5 sm:flex-row" style={{ animationDelay: "0.8s" }}>
-        <p className="font-mono text-[11px] text-faint">Generated {new Date(analysis.generatedAt).toLocaleTimeString("en-US")} · ClickHouse · Pioneer · TrueFoundry · Langfuse</p>
+        <p className="font-mono text-[11px] text-faint">Generated {analysis.generatedAt ? analysis.generatedAt.slice(11, 16) : ""} · ClickHouse · Pioneer · TrueFoundry · Langfuse</p>
         <Button asChild size="sm" variant="outline"><Link href="/analyze">Analyze another shipment<ArrowRight /></Link></Button>
       </div>
     </div>

@@ -14,7 +14,7 @@ export default function AnalyzePage() {
       <main className="mx-auto w-full max-w-2xl flex-1 px-6 pb-24 pt-16">
         <div className="animate-fade-up">
           <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-accent">
-            Step 1 of 2 — Shipment details
+            Step 1 — Shipment details
           </p>
           <h1 className="mt-3 font-display text-4xl font-semibold tracking-tight">
             What are you shipping?
