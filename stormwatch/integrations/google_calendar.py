@@ -187,7 +187,7 @@ async def reschedule_event(event_id: str, new_date: str, reason: str = "") -> bo
             json={
                 "start": {"date": new_start},
                 "end": {"date": new_end},
-                "description": f"RESCHEDULED by Lumin Stormwatch agent.\n{reason}\n\nOriginal event preserved.",
+                "description": f"RESCHEDULED by Lumin agent.\n{reason}\n\nOriginal event preserved.",
             },
         )
         if resp.status_code == 200:
@@ -233,7 +233,7 @@ async def create_shipment_event(title: str, date: str, origin: str, destination:
             headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
             json={
                 "summary": f"📦 {title} — {origin} → {destination}",
-                "description": f"Shipment: {title}\nRoute: {origin} → {destination}\nNotes: {notes}\n\nManaged by Lumin Stormwatch",
+                "description": f"Shipment: {title}\nRoute: {origin} → {destination}\nNotes: {notes}\n\nManaged by Lumin",
                 "start": {"date": date},
                 "end": {"date": date},
                 "transparency": "opaque",

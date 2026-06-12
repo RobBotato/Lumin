@@ -1,14 +1,14 @@
 /**
- * Weather risk analysis service — connects to Stormwatch backend.
+ * Weather risk analysis service — connects to Lumin backend.
  */
 import type { ShipmentInput, WeatherRiskAnalysis } from "@/lib/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
-export class StormwatchError extends Error {
+export class LuminError extends Error {
   constructor(message: string, public statusCode?: number) {
     super(message);
-    this.name = "StormwatchError";
+    this.name = "LuminError";
   }
 }
 
@@ -40,15 +40,15 @@ export async function getWeatherRiskAnalysis(
       }),
     });
   } catch {
-    throw new StormwatchError(
-      "Cannot reach the Stormwatch agent. Make sure the backend is running on port 8080.",
+    throw new LuminError(
+      "Cannot reach the Lumin agent. Make sure the backend is running on port 8080.",
     );
   }
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => "Unknown error");
-    throw new StormwatchError(
-      `Stormwatch API error (${response.status}): ${errorText}`,
+    throw new LuminError(
+      `Lumin API error (${response.status}): ${errorText}`,
       response.status,
     );
   }

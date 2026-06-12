@@ -53,7 +53,7 @@ async def lifespan(app: FastAPI):
     global agent, agent_task
 
     print("\n" + "=" * 60)
-    print("  STORMWATCH SERVER")
+    print("  LUMIN SERVER")
     print("=" * 60)
 
     # Initialize database (skip seed if already populated)
@@ -88,7 +88,7 @@ async def lifespan(app: FastAPI):
             pass
 
 
-app = FastAPI(title="Stormwatch", lifespan=lifespan)
+app = FastAPI(title="Lumin", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -917,7 +917,7 @@ async def calendar_event(
     description = (
         f"Shipment: {title}\\n"
         f"Route: {origin} → {destination}\\n"
-        f"Rescheduled by Lumin Stormwatch agent\\n"
+        f"Rescheduled by Lumin agent\\n"
         f"Notes: {notes}\\n"
         f"\\nPowered by Lumin — AI Supply Chain Intelligence"
     )
@@ -925,7 +925,7 @@ async def calendar_event(
     ics = (
         "BEGIN:VCALENDAR\r\n"
         "VERSION:2.0\r\n"
-        "PRODID:-//Lumin//Stormwatch//EN\r\n"
+        "PRODID:-//Lumin//EN\r\n"
         "BEGIN:VEVENT\r\n"
         f"DTSTART;VALUE=DATE:{dt_start}\r\n"
         f"DTEND;VALUE=DATE:{dt_end}\r\n"
@@ -1022,7 +1022,7 @@ async def root():
     index_path = static_dir / "index.html"
     if index_path.exists():
         return HTMLResponse(index_path.read_text())
-    return HTMLResponse("<h1>Stormwatch</h1><p>Static files not found.</p>")
+    return HTMLResponse("<h1>Lumin</h1><p>Static files not found.</p>")
 
 
 @app.get("/api/health")

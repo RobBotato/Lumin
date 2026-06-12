@@ -6,7 +6,7 @@
   <img src="https://img.shields.io/badge/license-MIT-green" alt="License MIT">
 </p>
 
-# ⚡ Lumin Stormwatch
+# ⚡ Lumin
 
 **AI-powered supply chain weather intelligence.** Detects storms, assesses risk against cargo sensitivity, auto-reschedules shipments on Google Calendar, and notifies clients via email — all through a multi-agent pipeline.
 

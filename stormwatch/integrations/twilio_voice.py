@@ -77,7 +77,7 @@ def _build_body(client_name, product_type, origin, destination, original_date, n
     new_date_str = new_date_label or new_date
 
     return (
-        f"{greeting} Lumin Stormwatch here.\n\n"
+        f"{greeting} Lumin here.\n\n"
         f"Your {product} shipment {route} originally scheduled for {original_date} "
         f"has been rescheduled to {new_date_str} (+{days_moved} days) due to severe weather.\n\n"
         f"{reason}\n\n"
@@ -197,7 +197,7 @@ def send_reschedule_email(
 <body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#0a0f1a;padding:40px 20px;margin:0">
 <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto">
   <tr><td style="padding-bottom:24px">
-    <h1 style="color:#5ff0e4;font-size:20px;margin:0">⚡ Lumin Stormwatch</h1>
+    <h1 style="color:#5ff0e4;font-size:20px;margin:0">⚡ Lumin</h1>
     <p style="color:#64748b;font-size:12px;margin:4px 0 0">Supply Chain Intelligence</p>
   </td></tr>
   <tr><td style="background:#111827;border:1px solid #1e293b;border-radius:12px;padding:32px">
@@ -227,7 +227,7 @@ def send_reschedule_email(
 
     try:
         msg = MIMEMultipart("alternative")
-        msg["From"] = f"Lumin Stormwatch <{EMAIL_FROM}>"
+        msg["From"] = f"Lumin <{EMAIL_FROM}>"
         msg["To"] = to_email
         msg["Subject"] = f"⚡ Shipment Rescheduled — {product} {route}"
         msg.attach(MIMEText(html, "html"))

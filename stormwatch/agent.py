@@ -38,7 +38,7 @@ class AgentLoop:
     async def start(self):
         self.running = True
         print(f"\n{'='*50}")
-        print("  STORMWATCH AGENT LOOP STARTING")
+        print("  LUMIN AGENT LOOP STARTING")
         print(f"  Demo mode: {DEMO_MODE}")
         print(f"  Poll interval: {AGENT_POLL_INTERVAL}s")
         print(f"  Threat radius: {THREAT_RADIUS_KM}km")

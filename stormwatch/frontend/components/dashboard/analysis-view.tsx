@@ -20,7 +20,7 @@ import { ThreatsCard } from "@/components/dashboard/threats-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AGENT_PIPELINE } from "@/lib/mock-data";
-import { getWeatherRiskAnalysis, StormwatchError } from "@/lib/services/weather-risk";
+import { getWeatherRiskAnalysis, LuminError } from "@/lib/services/weather-risk";
 import { type ShipmentInput, type WeatherRiskAnalysis } from "@/lib/types";
 
 const STEP_INTERVAL_MS = 480;
@@ -63,7 +63,7 @@ export function AnalysisView() {
     let cancelled = false;
     getWeatherRiskAnalysis(shipment)
       .then((result) => { if (!cancelled) setAnalysis(result); })
-      .catch((err) => { if (!cancelled) setError(err instanceof StormwatchError ? err.message : "An unexpected error occurred. Please try again."); });
+      .catch((err) => { if (!cancelled) setError(err instanceof LuminError ? err.message : "An unexpected error occurred. Please try again."); });
     const timers = AGENT_PIPELINE.map((_, i) => setTimeout(() => { if (!cancelled) setCompletedSteps(i + 1); }, (i + 1) * STEP_INTERVAL_MS));
     return () => { cancelled = true; timers.forEach(clearTimeout); };
   }, [shipment]);

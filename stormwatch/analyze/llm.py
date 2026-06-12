@@ -32,7 +32,7 @@ class RiskAssessment:
         }
 
 
-SYSTEM_PROMPT = """You are Stormwatch, an autonomous supply chain risk assessment agent.
+SYSTEM_PROMPT = """You are Lumin, an autonomous supply chain risk assessment agent.
 Analyze weather threats to active shipping routes and generate structured risk assessments.
 
 Given:

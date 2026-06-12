@@ -8,13 +8,13 @@ async def send_alert(assessment: dict, threat: dict | None = None):
     if risk_level not in ("high", "critical"):
         return
 
-    summary = assessment.get("summary", "Stormwatch detected a threat.")
+    summary = assessment.get("summary", "Lumin detected a threat.")
     impact = assessment.get("total_financial_impact_usd", 0)
     routes = assessment.get("affected_routes", [])
     recommendation = assessment.get("recommendation", "")
 
     message = (
-        f":warning: *STORMWATCH ALERT — {risk_level.upper()}*\n\n"
+        f":warning: *LUMIN ALERT — {risk_level.upper()}*\n\n"
         f"{summary}\n\n"
     )
     if impact:

@@ -1,5 +1,5 @@
 /**
- * Mock weather risk scenarios for WeatherGuard AI.
+ * Mock weather risk scenarios for Lumin.
  *
  * This is the single source of mock data for the entire app. To integrate a
  * sponsor weather API, replace the lookup in
