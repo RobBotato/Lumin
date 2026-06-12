@@ -53,6 +53,59 @@
 
 ---
 
+## How It Works
+
+When a shipment is submitted, Lumin runs a **7-step autonomous agent pipeline** across five integrated AI services:
+
+### 1. Shipment Ingest
+The FastAPI server receives the shipment — product type, origin, destination, date, cargo value, packaging, transport method, and risk tolerance. The route is matched against **72 shipping corridors** stored in ClickHouse.
+
+### 2. Weather Detection
+The system queries ClickHouse for active weather events within 300km of the route. Real-time storm data — latitude, longitude, wind speed, precipitation, severity — is cross-referenced against route waypoints. If a storm is found, it's flagged as a threat.
+
+### 3. Entity Extraction (Pioneer)
+The raw weather bulletin is sent to **Pioneer's NLP engine** (`fastino/gliner2-base-v1`) to extract structured entities: storm name, category, wind speed, affected location, duration, and direction. Falls back to regex-based extraction if the API is unavailable.
+
+### 4. Knowledge Base Lookup (Senso)
+The system searches a **local knowledge base** of historical disruption patterns — hurricane behavior in the Atlantic, typhoon patterns in the Pacific, port profiles, and response procedures. Relevant precedents are scored by keyword match and fed to the LLM for context.
+
+### 5. LLM Risk Assessment (TrueFoundry / OpenRouter)
+The structured threat data, extracted entities, historical context, and cargo sensitivity profile are sent to an LLM via **TrueFoundry** (with **OpenRouter** as fallback). The LLM returns a structured JSON risk assessment including risk level, confidence score, summary, financial impact, and a recommended action. A **mathematical risk score (0-100)** is computed independently from four factors: storm intensity, proximity, cargo sensitivity, and route exposure — weighted by the user's risk tolerance.
+
+### 6. Calendar Auto-Reschedule (Google Calendar)
+If the risk is HIGH or critical, Lumin automatically finds the next safe shipping window. It connects to **Google Calendar via OAuth2**, searches for the matching shipment event (marked with 📦), **cancels the original date** (crossed out in the calendar), and **creates a new event** on the rescheduled date. An `.ics` file is generated for one-click download.
+
+### 7. Client Notification (SMTP / Email)
+A formatted **HTML email** is sent to the client via SMTP (Gmail). The email includes a styled delivery card with the new date, reason for reschedule, and days moved. **Twilio SMS** and **Composio Slack alerts** are available as fallback notification channels.
+
+### Observability (Langfuse)
+Every step of the pipeline is traced through **Langfuse** — from entity extraction to LLM generation. Token usage, latency, and input/output are logged for debugging and cost tracking.
+
+### Real-Time Dashboard
+A **WebSocket** connection pushes agent events to the Next.js 15 frontend as they happen. The dashboard displays the animated agent timeline, risk score ring, threat matrix, financial breakdown, alternative routes, port weather, and safe shipping window forecast.
+
+---
+
+## Sponsors & Partners
+
+<p align="center">
+  <strong>Powered by industry-leading AI infrastructure</strong>
+</p>
+
+| Partner | Role in Lumin |
+|---------|---------------|
+| **ClickHouse** | Real-time analytical database — stores weather events, 72 shipping routes, port profiles, and historical disruptions. Powers sub-second threat detection queries across millions of data points. |
+| **TrueFoundry** | LLM gateway — routes risk assessment prompts to Claude Sonnet, handles authentication, and manages model fallback. |
+| **Pioneer** | NLP entity extraction — converts raw weather bulletins into structured storm data (name, category, wind speed, location). |
+| **Langfuse** | LLM observability — full tracing across the pipeline, token counting, latency tracking, cost monitoring. |
+| **OpenRouter** | LLM fallback gateway — automatically takes over if TrueFoundry is unavailable, ensuring zero downtime. |
+| **Google Calendar** | OAuth2 calendar sync — reads, cancels, and creates shipment events with automatic date conflict resolution. |
+| **Composio** | Slack integration — sends alerts to `#logistics-alerts` when high-risk assessments are generated. |
+| **Twilio** | SMS fallback — programmable messaging for client notifications when email delivery fails. |
+| **Senso** | Local knowledge base — historical weather disruption patterns, port profiles, and response procedures used to ground LLM assessments in real-world data. |
+
+---
+
 ## Features
 
 | Feature | Description |
@@ -68,7 +121,7 @@
 
 ---
 
-## APIs & Integrations
+## Environment Config Reference
 
 | Service | Purpose | Config |
 |---------|---------|--------|
