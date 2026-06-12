@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ForecastCart — Weather → Wallet Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #fef8ee;
+    --ink: #1c1c2b;
+    --ink-soft: #6b6a7d;
+
+    --pink: #ff5da2;       --pink-soft: #ffe2ef;
+    --yellow: #ffcc00;     --yellow-soft: #fff3c4;
+    --cyan: #00bcd1;       --cyan-soft: #d9f6f8;
+    --green: #06d6a0;      --green-soft: #d6f9ee;
+    --orange: #ff7a30;     --orange-soft: #ffe5d4;
+    --purple: #9b5de5;     --purple-soft: #ece1fb;
+    --blue: #3a86ff;       --blue-soft: #dde9ff;
+
+    --font-display: "Bungee", cursive;
+    --font-pixel: "Press Start 2P", monospace;
+    --font-body: "Space Mono", monospace;
+
+    --container: 1180px;
+    --border-w: 3px;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background-color: var(--bg);
+    background-image: radial-gradient(circle, rgba(28,28,43,0.05) 1px, transparent 1.4px);
+    background-size: 18px 18px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  a{ color: inherit; text-decoration: none; }
+  img, svg{ display:block; }
+
+  .shell{
+    max-width: var(--container);
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+
+  .rainbow-bar{
+    height: 6px;
+    width: 100%;
+    background: linear-gradient(90deg,
+      var(--pink), var(--orange), var(--yellow), var(--green), var(--cyan), var(--blue), var(--purple));
+  }
+
+  .card{
+    background: #ffffff;
+    border: var(--border-w) solid var(--ink);
+    box-shadow: 7px 7px 0 var(--ink);
+  }
+
+  .nav{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: var(--border-w) solid var(--ink);
+  }
+  .nav .shell{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height: 70px;
+    gap: 16px;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap: 12px;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .brand-mark{
+    width: 38px; height: 38px;
+    background: var(--yellow);
+    border: var(--border-w) solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .nav-links{
+    display:flex;
+    gap: 28px;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+  .nav-links a{ position:relative; padding-bottom: 4px; }
+  .nav-links a:nth-child(1):hover{ color: var(--pink); }
+  .nav-links a:nth-child(2):hover{ color: var(--cyan); }
+  .nav-links a:nth-child(3):hover{ color: var(--purple); }
+  .nav-links a:hover{ text-decoration: underline wavy; }
+
+  .live-pill{
+    display:flex; align-items:center; gap:8px;
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    color: var(--ink);
+    border: var(--border-w) solid var(--ink);
+    background: var(--green-soft);
+    padding: 9px 12px;
+    box-shadow: 3px 3px 0 var(--ink);
+    white-space: nowrap;
+  }
+  .live-dot{
+    width: 9px; height: 9px;
+    background: var(--green);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    animation: blink 1.2s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{ opacity: 0.15; } }
+
+  @media (max-width: 760px){ .nav-links{ display:none; } }
+
+  .hero{ padding: 64px 0 56px; }
+  .eyebrow{
+    display:inline-block;
+    font-family: var(--font-pixel);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    background: var(--pink-soft);
+    border: 2px solid var(--ink);
+    padding: 8px 12px;
+    margin-bottom: 28px;
+    transform: rotate(-2deg);
+  }
+  .hero h1{
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.9rem, 5vw, 3.4rem);
+    line-height: 1.35;
+    max-width: 920px;
+    letter-spacing: 0.01em;
+  }
+  .hero h1 .hl-pink{ color: var(--pink); }
+  .hero h1 .hl-cyan{ color: var(--cyan); }
+  .hero-sub{
+    margin-top: 24px;
+    max-width: 600px;
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+  }
+
+  .cascade-wrap{
+    margin-top: 48px;
+    padding: 28px 26px 26px;
+    background: #ffffff;
+  }
+  .cascade-label{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .cascade-label .title{
+    font-family: var(--font-pixel);
+    font-size: 0.62rem;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    padding: 7px 10px;
+  }
+  .cascade-label .meta{
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    font-weight: 700;
+  }
+  .cascade{
+    display:flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .cnode{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    flex: 1;
+    min-width: 0;
+  }
+  .cnode-icon{
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: var(--border-w) solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    font-size: 1.5rem;
+    transition: transform .25s, box-shadow .25s;
+  }
+  .cnode:nth-child(1) .cnode-icon{ background: var(--pink-soft); }
+  .cnode:nth-child(2) .cnode-icon{ background: var(--yellow-soft); }
+  .cnode:nth-child(3) .cnode-icon{ background: var(--orange-soft); }
+  .cnode:nth-child(4) .cnode-icon{ background: var(--cyan-soft); }
+  .cnode:nth-child(5) .cnode-icon{ background: var(--green-soft); }
+
+  .cnode-icon.is-active{
+    transform: scale(1.12);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+
+  .cnode-label{
+    margin-top: 12px;
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    letter-spacing: 0.04em;
+  }
+  .cnode-detail{
+    margin-top: 6px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .cnode-timing{
+    margin-top: 3px;
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  .loadbar{
+    display:flex;
+    gap: 4px;
+    margin: 24px 0 6px;
+  }
+  .loadbar .seg{
+    flex: 1;
+    height: 12px;
+    background: #f1ece1;
+    border: 2px solid var(--ink);
+    transition: background .2s;
+  }
+
+  @media (max-width: 720px){
+    .cnode-detail, .cnode-timing{ display:none; }
+    .cnode-icon{ width: 42px; height: 42px; font-size: 1.15rem; }
+  }
+
+  .stats{ padding: 0 0 70px; }
+  .stats-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .stat-card{
+    padding: 26px 28px;
+    border: var(--border-w) solid var(--ink);
+    box-shadow: 7px 7px 0 var(--ink);
+  }
+  .stat-card.c1{ background: var(--pink-soft); }
+  .stat-card.c2{ background: var(--cyan-soft); }
+  .stat-card.c3{ background: var(--yellow-soft); }
+  .stat-value{
+    font-family: var(--font-display);
+    font-size: 2.3rem;
+  }
+  .stat-label{
+    margin-top: 10px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  @media (max-width: 760px){ .stats-grid{ grid-template-columns: 1fr; } }
+
+  .section{
+    padding: 64px 0;
+    border-top: var(--border-w) solid var(--ink);
+  }
+  .section-head{
+    display:flex;
+    justify-content:space-between;
+    align-items: flex-end;
+    margin-bottom: 36px;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .section-head h2{
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 2.1rem);
+    letter-spacing: 0.01em;
+  }
+  .section-head h2 .dot{ color: var(--pink); }
+  .section-head p{
+    color: var(--ink-soft);
+    max-width: 440px;
+    font-size: 0.95rem;
+  }
+
+  .alert-grid{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  .alert-card{
+    padding: 22px;
+    display:flex;
+    flex-direction:column;
+    gap: 16px;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity .5s ease, transform .5s ease;
+    border-top: 6px solid var(--ink);
+    cursor: pointer;
+  }
+  .alert-card.is-visible{ opacity:1; transform:translateY(0); }
+  .alert-card.urgency-critical{ border-top-color: var(--pink); box-shadow: 7px 7px 0 var(--pink); }
+  .alert-card.urgency-high{ border-top-color: var(--orange); box-shadow: 7px 7px 0 var(--orange); }
+  .alert-card.urgency-medium{ border-top-color: var(--blue); box-shadow: 7px 7px 0 var(--blue); }
+
+  .alert-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+  .alert-icon{ font-size: 2rem; line-height: 1; }
+  .alert-name{ font-weight: 700; font-size: 1.05rem; margin-top: 8px; }
+  .alert-change{ font-family: var(--font-pixel); font-size: 0.6rem; margin-top: 8px; }
+  .alert-change.up{ color: var(--pink); }
+
+  .badge{
+    font-family: var(--font-pixel);
+    font-size: 0.55rem;
+    letter-spacing: 0.05em;
+    padding: 7px 9px;
+    border: 2px solid var(--ink);
+    white-space: nowrap;
+    flex-shrink:0;
+  }
+  .badge.critical{ background: var(--pink-soft); }
+  .badge.high{ background: var(--orange-soft); }
+  .badge.medium{ background: var(--blue-soft); }
+
+  .alert-cause{
+    display:flex; gap:10px; align-items:flex-start;
+    font-size: 0.85rem;
+    background: var(--bg);
+    border: 2px dashed var(--ink);
+    padding: 12px 14px;
+  }
+  .alert-cause .cause-icon{ font-size: 1.1rem; flex-shrink:0; line-height:1.3; }
+
+  .alert-prices{ display:flex; align-items:center; gap: 14px; }
+  .price-block{ flex: 1; }
+  .price-block .label{
+    font-family: var(--font-pixel);
+    font-size: 0.48rem;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+  }
+  .price-block .value{
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+  .price-block.predicted .value{ color: var(--pink); }
+  .price-arrow{ color: var(--ink-soft); font-size: 1.1rem; }
+
+  .alert-action{
+    display:flex; justify-content:space-between; align-items:center;
+    padding-top: 14px;
+    border-top: 2px dashed var(--ink);
+    font-size: 0.88rem;
+  }
+  .alert-action .savings strong{ color: var(--green); -webkit-text-stroke: 0.4px var(--ink); }
+  .alert-action .deadline{ color: var(--ink-soft); text-align:right; }
+  .alert-action .deadline strong{ color: var(--ink); }
+
+  .alert-confidence{ display:flex; align-items:center; gap: 10px; }
+  .confidence-track{
+    flex:1;
+    height: 10px;
+    border: 2px solid var(--ink);
+    background: #f1ece1;
+    overflow:hidden;
+  }
+  .confidence-fill{
+    height:100%;
+    background: var(--green);
+    width: 0%;
+    transition: width 1.1s steps(12);
+  }
+  .alert-card.is-visible .confidence-fill{ width: var(--conf); }
+  .confidence-text{
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+
+  @media (max-width: 980px){ .alert-grid{ grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px){ .alert-grid{ grid-template-columns: 1fr; } }
+
+  .network-grid{
+    display:grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+  }
+  .network-card{ padding: 18px; border-top: 6px solid var(--ink); }
+  .network-card.sev-1{ border-top-color: var(--pink); box-shadow: 6px 6px 0 var(--pink); }
+  .network-card.sev-2{ border-top-color: var(--cyan); box-shadow: 6px 6px 0 var(--cyan); }
+  .network-card.sev-3{ border-top-color: var(--purple); box-shadow: 6px 6px 0 var(--purple); }
+  .network-card.sev-4{ border-top-color: var(--orange); box-shadow: 6px 6px 0 var(--orange); }
+  .network-card.sev-5{ border-top-color: var(--green); box-shadow: 6px 6px 0 var(--green); }
+
+  .network-icon{ font-size: 1.7rem; }
+  .network-region{ margin-top: 12px; font-weight: 700; font-size: 0.95rem; }
+  .network-sev{
+    font-family: var(--font-pixel);
+    font-size: 0.48rem;
+    letter-spacing: 0.05em;
+    margin-top: 8px;
+    color: var(--ink-soft);
+  }
+  .network-tags{ margin-top: 14px; display:flex; flex-wrap:wrap; gap: 6px; }
+  .network-tag{
+    font-size: 0.74rem;
+    font-weight: 700;
+    background: var(--bg);
+    border: 2px solid var(--ink);
+    padding: 3px 8px;
+  }
+  @media (max-width: 980px){ .network-grid{ grid-template-columns: repeat(2, 1fr); } }
+
+  .log{ overflow:hidden; }
+  .log-row{
+    display:grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr 1.1fr;
+    gap: 12px;
+    padding: 14px 22px;
+    align-items:center;
+    border-bottom: 2px solid var(--ink);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .log-row:last-child{ border-bottom:none; }
+  .log-row.head{
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    letter-spacing: 0.06em;
+    background: var(--yellow);
+    text-transform: uppercase;
+  }
+  .log-row:nth-child(even):not(.head){ background: var(--blue-soft); }
+  .log-row:nth-child(odd):not(.head){ background: #ffffff; }
+  .log-status{
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    display:flex; align-items:center; gap:6px;
+  }
+  .log-status.hit{ color: var(--green); -webkit-text-stroke: 0.5px var(--ink); }
+  .log-status.miss{ color: var(--orange); -webkit-text-stroke: 0.5px var(--ink); }
+  @media (max-width: 760px){
+    .log-row{ grid-template-columns: 1.4fr 1fr 1fr; }
+    .log-row > div:nth-child(4){ display:none; }
+  }
+
+  footer{
+    border-top: var(--border-w) solid var(--ink);
+    padding: 50px 0 60px;
+    background: var(--purple-soft);
+  }
+  .footer-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+  .footer-tag{
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    max-width: 480px;
+    line-height: 1.45;
+  }
+  .footer-tag .accent{ color: var(--pink); }
+  .credits-title{
+    font-family: var(--font-pixel);
+    font-size: 0.55rem;
+    margin-bottom: 14px;
+  }
+  .sponsor-row{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  .sponsor-row span{
+    border: 2px solid var(--ink);
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+  .sponsor-row span:nth-child(1){ background: var(--pink-soft); }
+  .sponsor-row span:nth-child(2){ background: var(--yellow-soft); }
+  .sponsor-row span:nth-child(3){ background: var(--cyan-soft); }
+  .sponsor-row span:nth-child(4){ background: var(--green-soft); }
+  .sponsor-row span:nth-child(5){ background: var(--orange-soft); }
+  .sponsor-row span:nth-child(6){ background: var(--blue-soft); }
+  .sponsor-row span:nth-child(7){ background: #ffffff; }
+
+  .footer-bottom{
+    font-family: var(--font-pixel);
+    font-size: 0.5rem;
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap: 12px;
+    letter-spacing: 0.04em;
+    border-top: 2px dashed var(--ink);
+    padding-top: 20px;
+  }
+  .footer-bottom .insert-coin{
+    animation: blink 1s steps(1) infinite;
+  }
+</style>
+</head>
+<body>
+
+  <div class="rainbow-bar"></div>
+
+  <header class="nav">
+    <div class="shell">
+      <div class="brand"><span class="brand-mark">🛒</span> ForecastCart</div>
+      <nav class="nav-links">
+        <a href="#alerts">Alerts</a>
+        <a href="#map">Disruptions</a>
+        <a href="#accuracy">Scores</a>
+      </nav>
+      <div class="live-pill"><span class="live-dot"></span> LOADING · OPEN-METEO</div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="shell">
+      <span class="eyebrow">★ WEATHER → WALLET INTELLIGENCE ★</span>
+      <h1>
+        Weather forecasts tell you to bring an <span class="hl-cyan">umbrella</span>.<br>
+        We tell you to buy <span class="hl-pink">tomatoes</span> before they double in price.
+      </h1>
+      <p class="hero-sub">
+        ForecastCart traces every atmospheric event to the products it will touch — and the day prices change —
+        so you can buy before the shelf does.
+      </p>
+
+      <div class="cascade-wrap card">
+        <div class="cascade-label">
+          <span class="title">LOADING...</span>
+          <span class="meta">Fetching weather data...</span>
+        </div>
+        <div class="cascade">
+          <div class="cnode">
+            <div class="cnode-icon" data-step="0">❄️</div>
+            <div class="cnode-label">WEATHER</div>
+            <div class="cnode-detail">—</div>
+            <div class="cnode-timing">—</div>
+          </div>
+          <div class="cnode">
+            <div class="cnode-icon" data-step="1">🌾</div>
+            <div class="cnode-label">SUPPLY</div>
+            <div class="cnode-detail">—</div>
+            <div class="cnode-timing">—</div>
+          </div>
+          <div class="cnode">
+            <div class="cnode-icon" data-step="2">🚛</div>
+            <div class="cnode-label">LOGISTICS</div>
+            <div class="cnode-detail">—</div>
+            <div class="cnode-timing">—</div>
+          </div>
+          <div class="cnode">
+            <div class="cnode-icon" data-step="3">🏪</div>
+            <div class="cnode-label">RETAIL</div>
+            <div class="cnode-detail">—</div>
+            <div class="cnode-timing">—</div>
+          </div>
+          <div class="cnode">
+            <div class="cnode-icon" data-step="4">💸</div>
+            <div class="cnode-label">YOUR WALLET</div>
+            <div class="cnode-detail">—</div>
+            <div class="cnode-timing">—</div>
+          </div>
+        </div>
+        <div class="loadbar" id="loadbar"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="shell">
+      <div class="stats-grid">
+        <div class="stat-card c1">
+          <div class="stat-value" data-count="0" data-prefix="$">$0</div>
+          <div class="stat-label">Saved this year</div>
+        </div>
+        <div class="stat-card c2">
+          <div class="stat-value" data-count="0" data-suffix="%">0%</div>
+          <div class="stat-label">Prediction accuracy</div>
+        </div>
+        <div class="stat-card c3">
+          <div class="stat-value" data-count="0">0</div>
+          <div class="stat-label">Active alerts · 8 regions</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="alerts">
+    <div class="shell">
+      <div class="section-head">
+        <h2><span class="dot">●</span> Buy this before it moves</h2>
+        <p>Every alert below started as a forecast — and shows exactly when to act and how much it saves you.</p>
+      </div>
+      <div class="alert-grid">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="map">
+    <div class="shell">
+      <div class="section-head">
+        <h2><span class="dot">●</span> Active disruptions</h2>
+        <p>Jua's atmospheric model is tracking live events across key growing and shipping regions — each one a supply chain under stress.</p>
+      </div>
+      <div class="network-grid">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="accuracy">
+    <div class="shell">
+      <div class="section-head">
+        <h2><span class="dot">●</span> This isn't guessing</h2>
+        <p>Every resolved prediction is logged against what actually happened — Pioneer feeds the outcome back into the model.</p>
+      </div>
+      <div class="log card">
+        <div class="log-row head">
+          <div>Product</div>
+          <div>Predicted</div>
+          <div>Actual</div>
+          <div>Resolved</div>
+          <div>Result</div>
+        </div>
+        <!-- Populated dynamically by JS -->
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="shell">
+      <div class="footer-top">
+        <div>
+          <div class="credits-title">★ CREDITS ★</div>
+          <div class="footer-tag">
+            Physics in, savings out.<br><span class="accent">Every alert traces back to the atmosphere.</span>
+          </div>
+        </div>
+        <div>
+          <div class="credits-title">★ POWERED BY ★</div>
+          <div class="sponsor-row">
+            <span>JUA EPT-2</span>
+            <span>AIRBYTE</span>
+            <span>PIONEER</span>
+            <span>OPENUI</span>
+            <span>GUILD.AI</span>
+            <span>TRUEFOUNDRY</span>
+            <span>AWS</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 FORECASTCART</span>
+        <span class="insert-coin">PRESS START TO SAVE</span>
+      </div>
+    </div>
+  </footer>
+
+<script src="../js/icons.js"></script>
+<script src="../js/data/cascadeMappings.js"></script>
+<script src="../js/data/demoWeatherEvents.js"></script>
+<script src="../js/data/pastPredictions.js"></script>
+<script src="../js/engine/alertGenerator.js"></script>
+<script src="../js/engine/weatherApi.js"></script>
+<script src="../js/app-forecastcart.js"></script>
+</body>
+</html>

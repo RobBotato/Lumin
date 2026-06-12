@@ -1,0 +1,11 @@
+.env
+*.pyc
+__pycache__/
+.venv/
+node_modules/
+.next/
+.google_token.json
+*.log
+.DS_Store
+.env.local
+.env.*.local
